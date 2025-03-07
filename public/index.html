@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Canvas sandbox</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+      #canvas-container {
+        position: relative;
+        width: 100vw; /* Fills the browser */
+        height: 100vh;
+        overflow: hidden;
+      }
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      .controls {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(168, 165, 168, 0.541);
+        padding: 10px;
+        border-radius: 5px;
+        z-index: 10;
+      }
+      button {
+        margin: 5px;
+        padding: 5px 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="canvas-container">
+      <canvas id="main-canvas"></canvas>
+    </div>
+
+    <div class="controls">
+      <button id="add-vector">Add Vector</button>
+      <button id="reset-view">Reset View</button>
+      <div><span>Zoom: </span><span id="zoom-level">100%</span></div>
+    </div>
+
+    <script>
+      // Canvas setup
+      const canvas = document.getElementById("main-canvas");
+      const ctx = canvas.getContext("2d");
+
+      // Set canvas size
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resizeCanvas();
+      window.addEventListener("resize", resizeCanvas);
+
+      // Image and view state
+      const image = new Image();
+      image.src = "image.png";
+
+      let viewState = {
+        x: 0,
+        y: 0,
+        scale: 1,
+        dragging: false,
+        lastX: 0,
+        lastY: 0,
+      };
+
+      // TO-DO vector logic
+      let vectors = [];
+
+      // Initialize with a sample vector
+      image.onload = function () {
+        // Center the image on load
+        viewState.x = (canvas.width - image.width) / 2;
+        viewState.y = (canvas.height - image.height) / 2;
+
+        // Initial render
+        render();
+      };
+
+      // Mouse wheel zoom handler
+      canvas.addEventListener("wheel", function (e) {
+        e.preventDefault();
+
+        // Get cursor position
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        // Get position in image space
+        const imageX = (mouseX - viewState.x) / viewState.scale;
+        const imageY = (mouseY - viewState.y) / viewState.scale;
+
+        // Calculate zoom factor
+        const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+        viewState.scale *= zoomFactor;
+
+        // Limit zoom
+        viewState.scale = Math.min(Math.max(0.1, viewState.scale), 10);
+
+        // Adjust position to zoom towards cursor
+        viewState.x = mouseX - imageX * viewState.scale;
+        viewState.y = mouseY - imageY * viewState.scale;
+
+        // Update zoom display
+        document.getElementById("zoom-level").textContent =
+          Math.round(viewState.scale * 100) + "%";
+
+        render();
+      });
+
+      // Mouse down handler
+      canvas.addEventListener("mousedown", function (e) {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left; // finds our mouse pos ???
+        const mouseY = e.clientY - rect.top;
+        
+        // We're panning the image
+        viewState.dragging = true;
+        viewState.lastX = mouseX;
+        viewState.lastY = mouseY;
+
+        render();
+      });
+
+      // Mouse move handler
+      canvas.addEventListener("mousemove", function (e) {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        // Convert to image coordinates
+        const imageX = (mouseX - viewState.x) / viewState.scale;
+        const imageY = (mouseY - viewState.y) / viewState.scale;
+
+        
+        if (viewState.dragging) {
+          // We're panning the image
+          viewState.x += mouseX - viewState.lastX;
+          viewState.y += mouseY - viewState.lastY;
+          viewState.lastX = mouseX;
+          viewState.lastY = mouseY;
+          render();
+        }
+      });
+
+      // Mouse up handler
+      canvas.addEventListener("mouseup", function () {
+        viewState.dragging = false;
+        
+      });
+
+      // Mouse leave handler
+      canvas.addEventListener("mouseleave", function () {
+        viewState.dragging = false;
+       
+      });
+
+      // Add vector button handler
+      document
+        .getElementById("add-vector")
+        .addEventListener("click", function () {
+          console.log('add vector button hit')
+          render();
+        });
+
+      // Reset view button handler
+      document
+        .getElementById("reset-view")
+        .addEventListener("click", function () {
+          viewState.x = (canvas.width - image.width) / 2;
+          viewState.y = (canvas.height - image.height) / 2;
+          viewState.scale = 1;
+          document.getElementById("zoom-level").textContent = "100%";
+          render();
+        });
+
+      // Rendering function
+      function render() {
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Drawing the image
+        ctx.save();
+        ctx.translate(viewState.x, viewState.y);
+        ctx.scale(viewState.scale, viewState.scale);
+        ctx.drawImage(image, 0, 0);
+
+
+        ctx.restore();
+      }
+
+      
+    </script>
+  </body>
+</html>

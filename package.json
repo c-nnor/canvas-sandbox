@@ -1,0 +1,17 @@
+{
+  "name": "canvas",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@interactjs/types": "^1.10.27",
+    "@types/express": "^5.0.0",
+    "express": "^4.21.2",
+    "interactjs": "^1.10.27"
+  }
+}
