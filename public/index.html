@@ -31,6 +31,8 @@
 </div>
     <canvas id="myCanvas"></canvas>
     <script>
+        const cameraIconURL = 'camera.svg';  
+        const lockIconURL = 'lock.svg';  
         const canvas = document.getElementById('myCanvas');
         const ctx = canvas.getContext('2d');
 
@@ -39,7 +41,7 @@
         canvas.height = window.innerHeight;
 
         const background = new Image();
-        background.src = 'image.png'; // bg
+        background.src = 'floorplan.png'; // bg
 
         let scale = 1; 
         let offsetX = 0, offsetY = 0;
@@ -48,11 +50,14 @@
 
 
         let camera_icons = [
-          { x: 100, y: 100, width: 50, height: 50, color: 'red', dragging: false }
+            { x: 100, y: 100, width: 50, height: 50, dragging: false, image: new Image() }
         ];
+        camera_icons[0].image.src = cameraIconURL;
+
         let lock_icons = [
-          { x: 300, y: 200, width: 50, height: 50, color: 'blue', dragging: false }
+            { x: 300, y: 200, width: 50, height: 50, dragging: false, image: new Image() }
         ];
+        lock_icons[0].image.src = lockIconURL;
 
         let draggedObject = null;
 
@@ -61,24 +66,20 @@
         };
 
         function draw() {
-            ctx.setTransform(scale, 0, 0, scale, offsetX, offsetY);
-            ctx.clearRect(-offsetX / scale, -offsetY / scale, canvas.width / scale, canvas.height / scale);
-            ctx.drawImage(background, 0, 0, background.width, background.height);
+          ctx.setTransform(scale, 0, 0, scale, offsetX, offsetY);
+          ctx.clearRect(-offsetX / scale, -offsetY / scale, canvas.width / scale, canvas.height / scale);
+          ctx.drawImage(background, 0, 0, background.width, background.height);
 
+          // Draw camera icons
+          camera_icons.forEach(obj => {
+              ctx.drawImage(obj.image, obj.x, obj.y, obj.width, obj.height);
+          });
 
-
-            // Draw camera
-            camera_icons.forEach(obj => {
-              ctx.fillStyle = obj.color;
-              ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
-            })
-
-            // Draw lock
-            lock_icons.forEach(obj => {
-              ctx.fillStyle = obj.color;
-              ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
-            })
-        }
+          // Draw lock icons
+          lock_icons.forEach(obj => {
+              ctx.drawImage(obj.image, obj.x, obj.y, obj.width, obj.height);
+          });
+      }
 
         function getMousePos(evt) {
             return {
@@ -154,28 +155,32 @@
 
 
         function addCameraIcon() {
-        camera_icons.push({
-            x: (canvas.width / 2 - 25) / scale, 
-            y: (canvas.height / 2 - 25) / scale,  
-            width: 50, 
-            height: 50, 
-            color: 'red', 
-            dragging: false
-        });
-        draw();
-    }
+          const newCameraIcon = { 
+              x: (canvas.width / 2 - 25) / scale, 
+              y: (canvas.height / 2 - 25) / scale,  
+              width: 50, 
+              height: 50, 
+              dragging: false, 
+              image: new Image() 
+          };
+          newCameraIcon.image.src = cameraIconURL;
+          camera_icons.push(newCameraIcon);
+          draw();
+      }
 
-        function addLockIcon() {
-        lock_icons.push({
-            x: (canvas.width / 2 - 25) / scale, 
-            y: (canvas.height / 2 - 25) / scale,
-            width: 50, 
-            height: 50, 
-            color: 'blue', 
-            dragging: false
-        });
-        draw();
-}
+      function addLockIcon() {
+          const newLockIcon = {
+              x: (canvas.width / 2 - 25) / scale, 
+              y: (canvas.height / 2 - 25) / scale,
+              width: 50, 
+              height: 50, 
+              dragging: false, 
+              image: new Image()
+          };
+          newLockIcon.image.src = lockIconURL;
+          lock_icons.push(newLockIcon);
+          draw();
+      }
 
     </script>
 </body>
