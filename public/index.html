@@ -1,203 +1,381 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Canvas sandbox</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Layout Editor</title>
     <style>
-      body {
-        margin: 0;
-        overflow: hidden;
-      }
-      #canvas-container {
-        position: relative;
-        width: 100vw; /* Fills the browser */
-        height: 100vh;
-        overflow: hidden;
-      }
-      canvas {
-        position: absolute;
-        top: 0;
-        left: 0;
-      }
-      .controls {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        background: rgba(168, 165, 168, 0.541);
-        padding: 10px;
-        border-radius: 5px;
-        z-index: 10;
-      }
-      button {
-        margin: 5px;
-        padding: 5px 10px;
-      }
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        #canvas-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 10;
+        }
+        button {
+            margin: 5px;
+            padding: 5px 10px;
+        }
+        select {
+            margin: 5px;
+            padding: 5px;
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <div id="canvas-container">
-      <canvas id="main-canvas"></canvas>
+        <canvas id="main-canvas"></canvas>
     </div>
-
+    
     <div class="controls">
-      <button id="add-vector">Add Vector</button>
-      <button id="reset-view">Reset View</button>
-      <div><span>Zoom: </span><span id="zoom-level">100%</span></div>
+        <div>
+            <select id="item-type">
+                <option value="camera">Security Camera</option>
+                <option value="lock">Door Lock</option>
+            </select>
+            <button id="add-item">Add Item</button>
+            <button id="delete-item">Delete Selected</button>
+            <button id="reset-view">Reset View</button>
+        </div>
+        <div>
+            <span>Zoom: </span><span id="zoom-level">100%</span>
+        </div>
     </div>
 
     <script>
-      // Canvas setup
-      const canvas = document.getElementById("main-canvas");
-      const ctx = canvas.getContext("2d");
-
-      // Set canvas size
-      function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      }
-      resizeCanvas();
-      window.addEventListener("resize", resizeCanvas);
-
-      // Image and view state
-      const image = new Image();
-      image.src = "image.png";
-
-      let viewState = {
-        x: 0,
-        y: 0,
-        scale: 1,
-        dragging: false,
-        lastX: 0,
-        lastY: 0,
-      };
-
-      // TO-DO vector logic
-      let vectors = [];
-
-      // Initialize with a sample vector
-      image.onload = function () {
-        // Center the image on load
-        viewState.x = (canvas.width - image.width) / 2;
-        viewState.y = (canvas.height - image.height) / 2;
-
-        // Initial render
-        render();
-      };
-
-      // Mouse wheel zoom handler
-      canvas.addEventListener("wheel", function (e) {
-        e.preventDefault();
-
-        // Get cursor position
-        const rect = canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-
-        // Get position in image space
-        const imageX = (mouseX - viewState.x) / viewState.scale;
-        const imageY = (mouseY - viewState.y) / viewState.scale;
-
-        // Calculate zoom factor
-        const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
-        viewState.scale *= zoomFactor;
-
-        // Limit zoom
-        viewState.scale = Math.min(Math.max(0.1, viewState.scale), 10);
-
-        // Adjust position to zoom towards cursor
-        viewState.x = mouseX - imageX * viewState.scale;
-        viewState.y = mouseY - imageY * viewState.scale;
-
-        // Update zoom display
-        document.getElementById("zoom-level").textContent =
-          Math.round(viewState.scale * 100) + "%";
-
-        render();
-      });
-
-      // Mouse down handler
-      canvas.addEventListener("mousedown", function (e) {
-        const rect = canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left; // finds our mouse pos ???
-        const mouseY = e.clientY - rect.top;
+        // Canvas setup
+        const canvas = document.getElementById('main-canvas');
+        const ctx = canvas.getContext('2d');
         
-        // We're panning the image
-        viewState.dragging = true;
-        viewState.lastX = mouseX;
-        viewState.lastY = mouseY;
-
-        render();
-      });
-
-      // Mouse move handler
-      canvas.addEventListener("mousemove", function (e) {
-        const rect = canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-
-        // Convert to image coordinates
-        const imageX = (mouseX - viewState.x) / viewState.scale;
-        const imageY = (mouseY - viewState.y) / viewState.scale;
-
-        
-        if (viewState.dragging) {
-          // We're panning the image
-          viewState.x += mouseX - viewState.lastX;
-          viewState.y += mouseY - viewState.lastY;
-          viewState.lastX = mouseX;
-          viewState.lastY = mouseY;
-          render();
+        // Set canvas size
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
-      });
-
-      // Mouse up handler
-      canvas.addEventListener("mouseup", function () {
-        viewState.dragging = false;
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
         
-      });
-
-      // Mouse leave handler
-      canvas.addEventListener("mouseleave", function () {
-        viewState.dragging = false;
-       
-      });
-
-      // Add vector button handler
-      document
-        .getElementById("add-vector")
-        .addEventListener("click", function () {
-          console.log('add vector button hit')
-          render();
+        // Image and view state
+        const image = new Image();
+        image.src = "image.png";  // Placeholder image, representing a floor plan
+        
+        let viewState = {
+            x: 0,
+            y: 0,
+            scale: 1,
+            dragging: false,
+            lastX: 0,
+            lastY: 0
+        };
+        
+        // Security items (cameras and locks)
+        let securityItems = [];
+        let selectedItem = null;
+        let nextItemId = 1;
+        
+        // Initialize with some sample items
+        image.onload = function() {
+            // Center the image initially
+            viewState.x = (canvas.width - image.width) / 2;
+            viewState.y = (canvas.height - image.height) / 2;
+            
+            // Add a sample camera and lock to start with
+            addItem('camera');
+            addItem('lock');
+            
+            // Initial render
+            render();
+        };
+        
+        // Add a new security item
+        function addItem(type) {
+            // Place it in the center of the viewport
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            // Convert to image coordinates
+            const imageX = (centerX - viewState.x) / viewState.scale;
+            const imageY = (centerY - viewState.y) / viewState.scale;
+            
+            const newItem = {
+                id: nextItemId++,
+                type: type,
+                x: imageX,
+                y: imageY,
+                selected: false,
+                dragging: false
+            };
+            
+            // Add type-specific properties
+            if (type === 'camera') {
+                newItem.status = 'on'; // 'on' or 'off'
+            } else if (type === 'lock') {
+                newItem.lockState = 'locked'; // 'locked' or 'unlocked'
+            }
+            
+            securityItems.push(newItem);
+        }
+        
+        // Mouse wheel zoom handler
+        canvas.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            
+            // Get cursor position
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            // Get position in image space
+            const imageX = (mouseX - viewState.x) / viewState.scale;
+            const imageY = (mouseY - viewState.y) / viewState.scale;
+            
+            // Calculate zoom factor
+            const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+            viewState.scale *= zoomFactor;
+            
+            // Limit zoom
+            viewState.scale = Math.min(Math.max(0.1, viewState.scale), 10);
+            
+            // Adjust position to zoom towards cursor
+            viewState.x = mouseX - imageX * viewState.scale;
+            viewState.y = mouseY - imageY * viewState.scale;
+            
+            // Update zoom display
+            document.getElementById('zoom-level').textContent = Math.round(viewState.scale * 100) + '%';
+            
+            render();
         });
-
-      // Reset view button handler
-      document
-        .getElementById("reset-view")
-        .addEventListener("click", function () {
-          viewState.x = (canvas.width - image.width) / 2;
-          viewState.y = (canvas.height - image.height) / 2;
-          viewState.scale = 1;
-          document.getElementById("zoom-level").textContent = "100%";
-          render();
+        
+        // Mouse down handler
+        canvas.addEventListener('mousedown', function(e) {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            // Check if we're clicking on a security item
+            const imageX = (mouseX - viewState.x) / viewState.scale;
+            const imageY = (mouseY - viewState.y) / viewState.scale;
+            
+            // Clear previous selection
+            securityItems.forEach(item => item.selected = false);
+            let itemClicked = false;
+            
+            // Check each item (reversed to check top items first)
+            for (let i = securityItems.length - 1; i >= 0; i--) {
+                const item = securityItems[i];
+                
+                // Check if clicking on the item
+                const distToItem = Math.sqrt(
+                    Math.pow(imageX - item.x, 2) + 
+                    Math.pow(imageY - item.y, 2)
+                );
+                
+                const hitRadius = 15 / viewState.scale;
+                
+                if (distToItem < hitRadius) {
+                    // Clicked on the item
+                    item.dragging = 'position';
+                    item.selected = true;
+                    selectedItem = item;
+                    itemClicked = true;
+                    
+                    // Toggle status
+                    if (item.type === 'camera') {
+                        item.status = item.status === 'on' ? 'off' : 'on';
+                    } else if (item.type === 'lock') {
+                        item.lockState = item.lockState === 'locked' ? 'unlocked' : 'locked';
+                    }
+                    
+                    break;
+                }
+            }
+            
+            if (!itemClicked) {
+                // We're panning the image
+                viewState.dragging = true;
+                viewState.lastX = mouseX;
+                viewState.lastY = mouseY;
+                selectedItem = null;
+            }
+            
+            render();
         });
-
-      // Rendering function
-      function render() {
-        // Clear canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Drawing the image
-        ctx.save();
-        ctx.translate(viewState.x, viewState.y);
-        ctx.scale(viewState.scale, viewState.scale);
-        ctx.drawImage(image, 0, 0);
-
-
-        ctx.restore();
-      }
-
-      
+        
+        // Mouse move handler
+        canvas.addEventListener('mousemove', function(e) {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            // Convert to image coordinates
+            const imageX = (mouseX - viewState.x) / viewState.scale;
+            const imageY = (mouseY - viewState.y) / viewState.scale;
+            
+            if (selectedItem && selectedItem.dragging === 'position') {
+                // Moving the item
+                selectedItem.x = imageX;
+                selectedItem.y = imageY;
+                render();
+            } else if (viewState.dragging) {
+                // We're panning the image
+                viewState.x += mouseX - viewState.lastX;
+                viewState.y += mouseY - viewState.lastY;
+                viewState.lastX = mouseX;
+                viewState.lastY = mouseY;
+                render();
+            }
+        });
+        
+        // Mouse up handler
+        canvas.addEventListener('mouseup', function() {
+            viewState.dragging = false;
+            if (selectedItem) {
+                selectedItem.dragging = false;
+            }
+        });
+        
+        // Mouse leave handler
+        canvas.addEventListener('mouseleave', function() {
+            viewState.dragging = false;
+            if (selectedItem) {
+                selectedItem.dragging = false;
+            }
+        });
+        
+        // Add item button handler
+        document.getElementById('add-item').addEventListener('click', function() {
+            const itemType = document.getElementById('item-type').value;
+            addItem(itemType);
+            render();
+        });
+        
+        // Delete selected item button handler
+        document.getElementById('delete-item').addEventListener('click', function() {
+            if (selectedItem) {
+                securityItems = securityItems.filter(item => item.id !== selectedItem.id);
+                selectedItem = null;
+                render();
+            }
+        });
+        
+        // Reset view button handler
+        document.getElementById('reset-view').addEventListener('click', function() {
+            viewState.x = (canvas.width - image.width) / 2;
+            viewState.y = (canvas.height - image.height) / 2;
+            viewState.scale = 1;
+            document.getElementById('zoom-level').textContent = '100%';
+            render();
+        });
+        
+        // Rendering function
+        function render() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw the image
+            ctx.save();
+            ctx.translate(viewState.x, viewState.y);
+            ctx.scale(viewState.scale, viewState.scale);
+            ctx.drawImage(image, 0, 0);
+            
+            // Draw security items
+            securityItems.forEach(item => {
+                if (item.type === 'camera') {
+                    drawCamera(ctx, item);
+                } else if (item.type === 'lock') {
+                    drawLock(ctx, item);
+                }
+            });
+            
+            ctx.restore();
+        }
+        
+        // Draw a camera
+        function drawCamera(ctx, camera) {
+            // Draw camera icon
+            ctx.beginPath();
+            ctx.arc(camera.x, camera.y, 15 / viewState.scale, 0, Math.PI * 2);
+            ctx.fillStyle = camera.status === 'on' ? 'rgba(0, 128, 255, 0.8)' : 'rgba(128, 128, 128, 0.8)';
+            ctx.fill();
+            ctx.strokeStyle = camera.selected ? 'yellow' : 'white';
+            ctx.lineWidth = camera.selected ? 3 / viewState.scale : 2 / viewState.scale;
+            ctx.stroke();
+            
+            // Draw camera lens
+            ctx.beginPath();
+            ctx.arc(camera.x, camera.y, 6 / viewState.scale, 0, Math.PI * 2);
+            ctx.fillStyle = 'black';
+            ctx.fill();
+            
+            // Draw camera label
+            ctx.font = `${12 / viewState.scale}px Arial`;
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.fillText('CAM', camera.x, camera.y + 4 / viewState.scale);
+            
+            // Draw status indicator
+            ctx.font = `${10 / viewState.scale}px Arial`;
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.fillText(camera.status.toUpperCase(), camera.x, camera.y + 25 / viewState.scale);
+        }
+        
+        // Draw a door lock
+        function drawLock(ctx, lock) {
+            // Base of the lock
+            ctx.beginPath();
+            ctx.arc(lock.x, lock.y, 15 / viewState.scale, 0, Math.PI * 2);
+            ctx.fillStyle = lock.lockState === 'locked' ? 'rgba(255, 0, 0, 0.8)' : 'rgba(0, 255, 0, 0.8)';
+            ctx.fill();
+            ctx.strokeStyle = lock.selected ? 'yellow' : 'white';
+            ctx.lineWidth = lock.selected ? 3 / viewState.scale : 2 / viewState.scale;
+            ctx.stroke();
+            
+            // Draw lock icon
+            ctx.beginPath();
+            if (lock.lockState === 'locked') {
+                // Locked icon (padlock)
+                const lockSize = 10 / viewState.scale;
+                ctx.rect(lock.x - lockSize / 2, lock.y - lockSize / 2, lockSize, lockSize);
+                // Lock shackle
+                ctx.moveTo(lock.x - lockSize / 4, lock.y - lockSize / 2);
+                ctx.arc(lock.x, lock.y - lockSize / 2, lockSize / 4, Math.PI, 0, true);
+            } else {
+                // Unlocked icon (open padlock)
+                const lockSize = 10 / viewState.scale;
+                ctx.rect(lock.x - lockSize / 2, lock.y - lockSize / 2, lockSize, lockSize);
+                // Open shackle
+                ctx.moveTo(lock.x + lockSize / 4, lock.y - lockSize / 2);
+                ctx.arc(lock.x + lockSize / 2, lock.y - lockSize / 2, lockSize / 4, Math.PI, 0, true);
+            }
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2 / viewState.scale;
+            ctx.stroke();
+            
+            // Draw lock label
+            ctx.font = `${10 / viewState.scale}px Arial`;
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.fillText(lock.lockState.toUpperCase(), lock.x, lock.y + 25 / viewState.scale);
+        }
     </script>
-  </body>
+</body>
 </html>
