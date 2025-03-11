@@ -130,9 +130,48 @@
         #btnPopupClose{
             cursor:pointer;
         }
+
+
+        .context-menu {
+            display: none;
+            position: absolute;
+            background: black;
+            border: 1px solid #333;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            z-index: 1000;
+            font-family: Arial, sans-serif;
+        }
+
+        .context-menu ul {
+            list-style: none;
+            margin: 0;
+            padding: 5px;
+        }
+
+        .context-menu ul li {
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: blue;
+        }
+
+        .context-menu ul li:hover {
+            background: #222;
+        }
+
     </style>
 </head>
 <body>
+    <!-- Right clicking menu -->
+    <div id="contextMenu" class="context-menu">
+        <ul>
+            <li onclick="deleteIcon()">Delete</li>
+            <li onclick="option2()">Option2</li>
+            <li onclick="option3()">Option3</li>
+        </ul>
+    </div>
+
     <div id="overlay"></div>
     <div id="helpPopup">
         <div id="topHelpContent">
@@ -302,6 +341,90 @@
             scale = newScale;
             draw();
         });
+
+        // Reference for me - Please dont delete yet - OT
+        // ----------------------------------------------
+
+        // // deleting an icon
+        // let deleteMode = false;
+
+        // canvas.addEventListener('contextmenu', (e) => {
+        //     e.preventDefault(); // Prevent the default context menu
+
+        //     let mouse = getMousePos(e);
+
+        //     // Checking if click was on a camera icon
+        //     let clickedCamera = cameraIcons.find((obj) => obj.isMouseOver(mouse.x, mouse.y));
+        //     if (clickedCamera) {
+        //         // Removing the clicked camera icon
+        //         cameraIcons = cameraIcons.filter((obj) => obj !== clickedCamera);
+        //         draw(); // Redrawing the container
+        //         return;
+        //     }
+        
+        //     // Checking if clicked was on a lock icon
+        //     let clickedLock = lockIcons.find((obj) => obj.isMouseOver(mouse.x, mouse.y));
+        //     if (clickedLock) {
+        //         // Removing the clicked lock icon
+        //         lockIcons = lockIcons.filter((obj) => obj !== clickedLock);
+        //         draw(); // Redrawing the container
+        //         return;
+        //     }
+        // });
+
+
+        let selectedIcon = null; // Store the selected icon
+
+        document.addEventListener("contextmenu", (e) => {
+            e.preventDefault(); // Preventing the systems default right-click menu
+
+            let mouse = getMousePos(e);
+            selectedIcon = [...cameraIcons, ...lockIcons].find(obj => obj.isMouseOver(mouse.x, mouse.y));
+
+            if (selectedIcon) {
+                // Showing the menu where the mouse is on the screen
+                const menu = document.getElementById("contextMenu");
+                menu.style.left = `${e.pageX}px`;
+                menu.style.top = `${e.pageY}px`;
+                menu.style.display = "block";
+            } 
+            else {
+                closeContextMenu(); // closing the menu when the 
+            }
+        });// Context Menu END
+
+        // Function to close menu when clicking elsewhere
+        document.addEventListener("click", () => {
+            closeContextMenu();
+        });
+
+        // Function to close menu on icon
+        function closeContextMenu() {
+            document.getElementById("contextMenu").style.display = "none";
+        }
+
+        // Deleting the selected icon
+        function deleteIcon() {
+            if (selectedIcon) {
+                cameraIcons = cameraIcons.filter(obj => obj !== selectedIcon);
+                lockIcons = lockIcons.filter(obj => obj !== selectedIcon);
+                draw();
+                closeContextMenu();
+            }
+        }
+
+        // Menu option 2 - Likely going to be changing icon/class
+        function option2() {
+            console.log("Option 2 - Change icon option");
+            closeContextMenu();
+        }
+
+        // Menu option 3 - likely going to be changing the colour/ grouping
+        function option3() {
+            console.log("Option 3 - Potenital change colour/ grouping option");
+            closeContextMenu();
+        }
+
 
         function addCameraIcon() {
             const newCamera = new CameraIcon((canvas.width / 2 - 25) / scale, (canvas.height / 2 - 25) / scale);
