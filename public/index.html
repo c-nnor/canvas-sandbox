@@ -21,14 +21,13 @@
             background: rgb(37, 37, 37);
             padding: 10px;
             border-radius: 5px;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
-            border:solid 0.1px rgb(66, 66, 66)k;
+            border:solid 0.1px rgb(66, 66, 66);
             color:white;
             transition: opacity 0.3s ease, transform 0.3s ease-in-out;
 
         }
         .btnControl {
-            margin-left: 5px;
+            margin-left: 10px;
         }
 
         #btnAddLock{
@@ -66,13 +65,93 @@
         #btnAddCam:hover{
             background-color: rgb(201, 201, 201);
         }
+
+        #btnHelp{
+            background-image: url(btn_help.svg);
+            width:30px;
+            height:30px;
+            background-size: contain; 
+            background-position: center;
+            border-radius:40px;
+            content: "Click to add a cam";
+            background-repeat: no-repeat;
+            cursor:pointer;
+            background-color: transparent;
+            transition: 0.2s ease-in-out;
+            border:0;
+            box-shadow: 0.2px 0.2px 0.2px;
+            transition: 0.3s ease-in-out;
+            overflow:hidden;
+        }
+
+        #btnHelp:hover{
+            background-color: rgb(255, 255, 255);
+        }
+
+        #helpPopup{
+            font-family: Arial, Helvetica, sans-serif;
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            margin: auto;
+            width: 50%;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 99;
+        }
+
+        #topHelpContent{
+            display:flex;
+            justify-content: space-between;
+            align-items: center;
+            padding:0 5%;
+        }
+        #topHelpContent p{
+            font-size:2rem;
+            font-weight:bold;
+            margin:0;
+        }
+
+        #btnPopupClose{
+            cursor:pointer;
+        }
     </style>
 </head>
 <body>
+    <div id="overlay"></div>
+    <div id="helpPopup">
+        <div id="topHelpContent">
+            <h2>App Help</h2>
+            <p id="btnPopupClose">X</p>
+        </div>
+        <ul>
+            <li>Upload an image using the choose file in the top right</li>
+            <li>Zoom in using your mouse wheel</li>
+            <li>Move around the image by clicking and dragging</li>
+            <li>Add Security Icons by clicking the buttons at the top</li>
+            <li>If you forget anything just click the ?   button</li>
+        </ul>
+    </div>
     <div id="control-panel">
         <input type="file" id="imgInput" onchange="changeImage(event)" accept="image/*">
         <button id="btnAddCam" class="btnControl" onclick="addCameraIcon()" title="Click to add a camera icon"></button>
         <button id="btnAddLock" class="btnControl" onclick="addLockIcon()" title="Click to add a lock icon"></button>
+        <button id="btnHelp" class="btnControl" onclick="openHelpPopup()"></button>
     </div>
     <canvas id="myCanvas"></canvas>
     <script>
@@ -117,6 +196,8 @@
                        mouseY >= this.y && mouseY <= this.y + this.height;
             }
         }
+
+
 
         const canvas = document.getElementById('myCanvas');
         const ctx = canvas.getContext('2d');
@@ -211,7 +292,7 @@
             e.preventDefault();
             let zoomIntensity = 0.1;
             let newScale = scale + (e.deltaY > 0 ? -zoomIntensity : zoomIntensity);
-            newScale = Math.max(0.5, Math.min(2, newScale));
+            newScale = Math.max(0.3, Math.min(2, newScale));
 
             let mouseX = e.clientX - canvas.offsetLeft;
             let mouseY = e.clientY - canvas.offsetTop;
@@ -244,6 +325,36 @@
                 reader.readAsDataURL(file);
             }
         }
+
+
+
+        function openHelpPopup() {
+            let overlay = document.getElementById("overlay");
+            let helpPopup = document.getElementById("helpPopup");
+                if (overlay.style.display === "none" || overlay.style.display === "") {
+                    overlay.style.display = "block";
+                    helpPopup.style.display = "block";
+                } else {
+                    overlay.style.display = "none";
+                    helpPopup.style.display = "none";
+                }
+            };
+
+            document.getElementById("btnPopupClose").addEventListener('click', function(){
+                document.getElementById('overlay').style.display = "none";
+                document.getElementById("helpPopup").style.display = "none";
+            });
+
+            // Close popup when clicking on the overlay
+            document.getElementById("overlay").addEventListener("click", function() {
+                this.style.display = "none";
+                document.getElementById("helpPopup").style.display = "none";
+            });
+
+            window.onload = function () {
+                console.log("Window loaded...")
+                openHelpPopup(); // Call the function to show the popup when the page loads
+            };
     </script>
 </body>
 </html>
