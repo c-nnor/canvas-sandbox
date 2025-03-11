@@ -15,6 +15,7 @@
         }
         #control-panel {
         position: absolute;
+        display:flex;
         top: 10px;
         left: 10px;
         background: white;
@@ -25,10 +26,13 @@
     </style>
 </head>
 <body>
-  <div id="control-panel">
-    <button onclick="addCameraIcon()">Add Camera</button>
-    <button onclick="addLockIcon()">Add Lock</button>
-</div>
+    <div id="control-panel">
+        <div>
+            <input type="file" id="imgInput" onchange="changeImage(event)" accept="image/*">
+        </div>
+        <button onclick="addCameraIcon()">Add Camera</button>
+        <button onclick="addLockIcon()">Add Lock</button>
+    </div>
     <canvas id="myCanvas"></canvas>
     <script>
         const cameraIconURL = 'camera.svg';  
@@ -180,6 +184,17 @@
           newLockIcon.image.src = lockIconURL;
           lock_icons.push(newLockIcon);
           draw();
+      }
+
+      function changeImage (event) {
+        const file = event.target.files[0];
+        if(file){
+            const reader = new FileReader();
+            reader.onload = function(e){
+                background.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
       }
 
     </script>
