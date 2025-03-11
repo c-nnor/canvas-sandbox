@@ -18,21 +18,61 @@
             display: flex;
             top: 10px;
             left: 10px;
-            background: white;
+            background: rgb(37, 37, 37);
             padding: 10px;
             border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+            border:solid 0.1px rgb(66, 66, 66)k;
+            color:white;
+            transition: opacity 0.3s ease, transform 0.3s ease-in-out;
+
         }
         .btnControl {
             margin-left: 5px;
+        }
+
+        #btnAddLock{
+            background-image: url(lock_v2.svg);
+            width:50px;
+            height:50px;
+            background-size:30px 30px; 
+            background-position: center;
+            border-radius:10px;
+            background-repeat: no-repeat;
+            cursor:pointer;
+            background-color: rgb(0, 0, 0);
+            transition: 0.2s ease-in-out;
+        }
+
+        #btnAddLock:hover{
+            background-color: rgb(201, 201, 201);
+        }
+
+
+        #btnAddCam{
+            background-image: url(camera_v2.svg);
+            width:50px;
+            height:50px;
+            background-size: 50px 50px; 
+            background-position: center;
+            border-radius:10px;
+            content: "Click to add a cam";
+            background-repeat: no-repeat;
+            cursor:pointer;
+            background-color: rgb(0, 0, 0);
+            transition: 0.2s ease-in-out;
+        }
+
+        #btnAddCam:hover{
+            background-color: rgb(201, 201, 201);
         }
     </style>
 </head>
 <body>
     <div id="control-panel">
         <input type="file" id="imgInput" onchange="changeImage(event)" accept="image/*">
-        <button class="btnControl" onclick="addCameraIcon()">Add Camera</button>
-        <button class="btnControl" onclick="addLockIcon()">Add Lock</button>
+        <button id="btnAddCam" class="btnControl" onclick="addCameraIcon()" title="Click to add a camera icon"></button>
+        <button id="btnAddLock" class="btnControl" onclick="addLockIcon()" title="Click to add a lock icon"></button>
     </div>
     <canvas id="myCanvas"></canvas>
     <script>
@@ -44,7 +84,7 @@
                 this.height = 75;
                 this.dragging = false;
                 this.image = new Image();
-                this.image.src = 'camera v2.svg';
+                this.image.src = 'camera_v2.svg';
             }
 
             draw(ctx) {
@@ -65,7 +105,7 @@
                 this.height = 50;
                 this.dragging = false;
                 this.image = new Image();
-                this.image.src = 'lock v2.svg';
+                this.image.src = 'lock_v2.svg';
             }
 
             draw(ctx) {
@@ -128,6 +168,7 @@
                 isPanning = true;
                 lastX = e.clientX;
                 lastY = e.clientY;
+                document.getElementById('control-panel').style.opacity = "0";
             }
             canvas.style.cursor = "grabbing";
         });
@@ -154,6 +195,7 @@
             if (draggedObject) draggedObject.dragging = false;
             isPanning = false;
             draggedObject = null;
+            document.getElementById('control-panel').style.opacity = "1";
             canvas.style.cursor = "grab";
         });
 
