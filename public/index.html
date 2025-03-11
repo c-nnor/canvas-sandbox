@@ -252,7 +252,8 @@
         let isPanning = false;
         let lastX, lastY;
         let draggedObject = null;
-
+        // Vars for the last valid position of an icon
+        let lastValidX, lastValidY;
         let cameraIcons = [new CameraIcon(100, 100)];
         let lockIcons = [new LockIcon(300, 200)];
 
@@ -299,6 +300,18 @@
             if (draggedObject && draggedObject.dragging) {
                 draggedObject.x = mouse.x - draggedObject.width / 2;
                 draggedObject.y = mouse.y - draggedObject.height / 2;
+
+                // Get the full array of icons for manipulation
+                let allIcons = cameraIcons.concat(lockIcons);
+                // 
+                if (checkOverlap(draggedObject, allIcons)){
+                    // If an overlap is detected revert to last valid position
+                    draggedObject.x = lastValidX;
+                    draggedObject.y = lastValidY;
+                }else{
+                    lastValidX = draggedObject.x;
+                    lastValidY = draggedObject.y;
+                }
                 draw();
             } else if (isPanning) {
                 let dx = e.clientX - lastX;
@@ -447,9 +460,7 @@
                 };
                 reader.readAsDataURL(file);
             }
-        }
-
-
+        };
 
         function openHelpPopup() {
             let overlay = document.getElementById("overlay");
@@ -477,6 +488,26 @@
             window.onload = function () {
                 console.log("Window loaded...")
                 openHelpPopup(); // Call the function to show the popup when the page loads
+            };
+
+            // Logic for checking icons don't overlap
+            function checkOverlap(currentIcon, existingIcons){
+                console.log("\nChecking overlap...")
+                for(let icon of existingIcons){
+                    if(currentIcon !== icon &&
+                        // check the x and y axis dont match
+                        // We can do this by checking the x value of existing icons plus the width is less than the selected icons x value plus its with
+                        currentIcon.x < icon.x + icon.width &&
+                        currentIcon.x + currentIcon.width > icon.x &&
+                        currentIcon.y < icon.y + icon.height &&
+                        currentIcon.y + currentIcon.height > icon.y
+                    ){
+                        // There is an overlap so returning true
+                        return true;
+                    }
+                }
+                // There is no overlap
+                return false;
             };
     </script>
 </body>
