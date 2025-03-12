@@ -30,6 +30,7 @@
             <li>Move around the image by clicking and dragging</li>
             <li>Add Security Icons by clicking the buttons at the top</li>
             <li>If you forget anything just click the ?   button</li>
+            <li>Right click to see options for an icon</li>
         </ul>
     </div>
 
@@ -38,6 +39,7 @@
         <input type="file" id="imgInput" onchange="changeImage(event)" accept="image/*">
         <button id="btnAddCam" class="btnControl" onclick="addCameraIcon()" title="Click to add a camera icon"></button>
         <button id="btnAddLock" class="btnControl" onclick="addLockIcon()" title="Click to add a lock icon"></button>
+        <button id="btnClearIcons" onclick="clearIcons()" title="Click to clear all Icons">Clear All Icons</button>
         <button id="btnHelp" class="btnControl" onclick="openHelpPopup()"></button>
     </div>
     <!-- Canvas for drawing the image and icon -->
