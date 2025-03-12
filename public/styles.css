@@ -1,0 +1,154 @@
+body {
+    margin: 0;
+    overflow: hidden;
+}
+canvas {
+    display: block;
+    cursor: grab;
+}
+#control-panel {
+    position: absolute;
+    display: flex;
+    top: 10px;
+    left: 10px;
+    background: rgb(37, 37, 37);
+    padding: 10px;
+    border-radius: 5px;
+    border:solid 0.1px rgb(66, 66, 66);
+    color:white;
+    transition: opacity 0.3s ease, transform 0.3s ease-in-out;
+
+}
+.btnControl {
+    margin-left: 10px;
+}
+
+#btnAddLock{
+    background-image: url(assets/lock_v2.svg);
+    width:50px;
+    height:50px;
+    background-size:30px 30px; 
+    background-position: center;
+    border-radius:10px;
+    background-repeat: no-repeat;
+    cursor:pointer;
+    background-color: rgb(0, 0, 0);
+    transition: 0.2s ease-in-out;
+}
+
+#btnAddLock:hover{
+    background-color: rgb(201, 201, 201);
+}
+
+
+#btnAddCam{
+    background-image: url(assets/camera_v2.svg);
+    width:50px;
+    height:50px;
+    background-size: 50px 50px; 
+    background-position: center;
+    border-radius:10px;
+    content: "Click to add a cam";
+    background-repeat: no-repeat;
+    cursor:pointer;
+    background-color: rgb(0, 0, 0);
+    transition: 0.2s ease-in-out;
+}
+
+#btnAddCam:hover{
+    background-color: rgb(201, 201, 201);
+}
+
+#btnHelp{
+    background-image: url(assets/btn_help.svg);
+    width:30px;
+    height:30px;
+    background-size: contain; 
+    background-position: center;
+    border-radius:40px;
+    content: "Click to add a cam";
+    background-repeat: no-repeat;
+    cursor:pointer;
+    background-color: transparent;
+    transition: 0.2s ease-in-out;
+    border:0;
+    box-shadow: 0.2px 0.2px 0.2px;
+    transition: 0.3s ease-in-out;
+    overflow:hidden;
+}
+
+#btnHelp:hover{
+    background-color: rgb(255, 255, 255);
+}
+
+#helpPopup{
+    font-family: Arial, Helvetica, sans-serif;
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: auto;
+    width: 50%;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+}
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 99;
+}
+
+#topHelpContent{
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    padding:0 5%;
+}
+#topHelpContent p{
+    font-size:2rem;
+    font-weight:bold;
+    margin:0;
+}
+
+#btnPopupClose{
+    cursor:pointer;
+}
+
+
+.context-menu {
+    display: none;
+    position: absolute;
+    background: black;
+    border: 1px solid #333;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+}
+
+.context-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 5px;
+}
+
+.context-menu ul li {
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: background 0.2s;
+    color: blue;
+}
+
+.context-menu ul li:hover {
+    background: #222;
+}
