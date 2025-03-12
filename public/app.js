@@ -232,8 +232,27 @@ function deleteIcon() {
 };
 
 // Menu option 2 - Likely going to be changing icon/class
-function option2() {
-    console.log("Option 2 - Change icon option");
+function changeIcon() {
+    // console.log("Option 2 - Change icon option");
+    if (!selectedIcon) {
+        return;
+    }
+    else if (cameraIcons.includes(selectedIcon)) {
+        // Swap from camera to lock
+        cameraIcons = cameraIcons.filter(obj => obj !== selectedIcon);
+        const newLock = new LockIcon(selectedIcon.x, selectedIcon.y);
+        lockIcons.push(newLock);
+    }
+    else if (lockIcons.includes(selectedIcon)) {
+        // Swap from lock to camera
+        lockIcons = lockIcons.filter(obj => obj !== selectedIcon);
+        const newCamera = new CameraIcon(selectedIcon.x, selectedIcon.y);
+        cameraIcons.push(newCamera);
+    }
+
+    // if(selectedIcon.Image=='assets/lock_v2.svg')
+
+    draw()
     closeContextMenu();
 };
 
