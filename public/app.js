@@ -246,14 +246,71 @@ function option3() {
 
 function addCameraIcon() {
     const newCamera = new CameraIcon((canvas.width / 2 - 25) / scale, (canvas.height / 2 - 25) / scale);
-    cameraIcons.push(newCamera);
-    draw();
+    const allIcons = cameraIcons.concat(lockIcons);
+    if(!checkOverlap(newCamera, allIcons)){
+        cameraIcons.push(newCamera);
+        draw();
+    }else{
+        // generate a random number between -50 and 100
+        const randomShift = () => Math.floor(Math.random() * (300 + 1)) - 100   ;
+        let placed = false;
+        let attempts = 0;
+        let maxAttempts = 10;
+        // If the space is taken run through icons and find a space that isnt taken
+        while(!placed && attempts < maxAttempts){
+            const newIconX = newCamera.x + randomShift();
+            const newIconY = newCamera.y + randomShift();
+            const newCamera2 = new CameraIcon(newIconX, newIconY);
+            console.log("icon created")
+            if(!checkOverlap(newCamera2, allIcons)){
+                cameraIcons.push(newCamera2);
+                draw();
+                console.log("icon placed")
+                placed = true;
+            }else{
+                attempts++;
+            }
+        }
+        if (!placed) {
+            console.log("Failed to place the icon after multiple attempts");
+        }
+    }
 };
 
 function addLockIcon() {
     const newLock = new LockIcon((canvas.width / 2 - 25) / scale, (canvas.height / 2 - 25) / scale);
-    lockIcons.push(newLock);
-    draw();
+    
+    const allIcons = cameraIcons.concat(lockIcons);
+    if(!checkOverlap(newLock, allIcons)){
+        lockIcons.push(newLock);
+        draw();
+    }else{
+        // generate a random number between -100 and 100
+        const randomShift = () => Math.floor(Math.random() * (300 + 1)) - 100;
+
+        let placed = false;
+        let attempts = 0;
+        let maxAttempts = 10;
+
+        while(!placed && attempts < maxAttempts){
+            console.log("starting runing through icons")
+            const newIconX = newLock.x + randomShift();
+            const newIconY = newLock.y + randomShift();
+            const newLock2 = new LockIcon(newIconX, newIconY);
+            console.log("icon created")
+            if(!checkOverlap(newLock2, allIcons)){
+                lockIcons.push(newLock2);
+                draw();
+                console.log("icon placed")
+                placed = true;
+            }else{
+                attempts++;
+            }
+        }
+        if (!placed) {
+            console.log("Failed to place the icon after multiple attempts");
+        }
+    }
 };
 
 function changeImage(event) {
@@ -315,3 +372,12 @@ function checkOverlap(currentIcon, existingIcons) {
     // There is no overlap
     return false;
 };
+
+function clearIcons (){
+    // Set the camera and lock icons to empty arrays to wipe all assets
+    cameraIcons.length = 0;
+    lockIcons.length = 0;
+    // Redraw the canvas        // generate a random number between -100 and 100
+        const randomShift = () => Math.floor(Math.random() * (200 + 1)) - 150;
+    draw();
+}
