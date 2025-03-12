@@ -4,7 +4,7 @@ body {
 }
 canvas {
     display: block;
-    cursor: grab;
+    /* cursor: grab; */
 }
 #control-panel {
     position: absolute;
@@ -142,6 +142,17 @@ canvas {
     padding: 5px;
 }
 
+#canvasMenu{
+    display: none;
+    position: absolute;
+    background: black;
+    border: 1px solid #333;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+}
+
 .context-menu ul li {
     padding: 8px 15px;
     cursor: pointer;
@@ -171,4 +182,8 @@ canvas {
     background-color: rgb(255, 0, 0);
     color:rgb(253, 253, 253);
     cursor:pointer;
+}
+
+.pointer-cursor {
+    cursor: pointer;
 }

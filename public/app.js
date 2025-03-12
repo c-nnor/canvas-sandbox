@@ -102,6 +102,18 @@ canvas.addEventListener('mousedown', (e) => {
 canvas.addEventListener('mousemove', (e) => {
     let mouse = getMousePos(e);
 
+
+    const mouseX = e.pageX;
+    const mouseY = e.pageY;
+
+    [...cameraIcons, ...lockIcons].forEach(icon => {
+        if (icon.isMouseOver(mouseX, mouseY)) {
+            document.body.style.cursor = 'pointer';  // Change cursor to pointer
+        } else {
+            document.body.style.cursor = 'default';  // Reset cursor when not over the element
+        }
+    });
+
     if (draggedObject && draggedObject.dragging) {
         draggedObject.x = mouse.x - draggedObject.width / 2;
         draggedObject.y = mouse.y - draggedObject.height / 2;
@@ -209,6 +221,17 @@ document.addEventListener("contextmenu", (e) => {
     else {
         closeContextMenu(); // closing the menu when the 
     }
+
+    // Logic for if the user is just clicking on the canvas
+    // THIS IS WIP the menu needs to be fixed so that the add item button creates an icon on mouse position
+    if(!selectedIcon){
+        const canvasMenu = document.getElementById("canvasMenu")
+        canvasMenu.style.left = `${e.pageX}px`;
+        canvasMenu.style.top = `${e.pageY}px`;
+        canvasMenu.style.display = "block";
+    }else{
+        closeCanvasMenu();
+    }
 });// Context Menu END
 
 // Function to close menu when clicking elsewhere
@@ -220,6 +243,14 @@ document.addEventListener("click", () => {
 function closeContextMenu() {
     document.getElementById("contextMenu").style.display = "none";
 };
+
+function closeCanvasMenu() {
+    document.getElementById("canvasMenu").style.display = "none";
+};
+
+document.addEventListener("click", () => {
+    closeCanvasMenu();
+});
 
 // Deleting the selected icon
 function deleteIcon() {
@@ -393,10 +424,9 @@ function checkOverlap(currentIcon, existingIcons) {
 };
 
 function clearIcons (){
-    // Set the camera and lock icons to empty arrays to wipe all assets
+    // Clear the camera and lock icon arrays
     cameraIcons.length = 0;
     lockIcons.length = 0;
-    // Redraw the canvas        // generate a random number between -100 and 100
-        const randomShift = () => Math.floor(Math.random() * (200 + 1)) - 150;
+    // Redraw the canvas
     draw();
 }
